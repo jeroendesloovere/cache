@@ -6,6 +6,9 @@ require_once('../cache.php');
 // [optional] set the path where the cache should be saved to
 Cache::setCachePath($_SERVER['DOCUMENT_ROOT'] . '/cache/');
 
+// [optional] set the extension for the cache files
+Cache::setCacheExtension('.cache');
+
 // set data to cache
 //Cache::setData('blog', 'articles', array('items' => 'test'));
 
