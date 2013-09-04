@@ -195,6 +195,7 @@ class Cache
 	 * @param string $type
 	 * @param string $group
 	 * @param int $id
+	 * @return string
 	 */
 	private static function getCachePathToFile($type, $group, $id)
 	{
@@ -212,6 +213,7 @@ class Cache
 	 * @param string $group
 	 * @param int $id
 	 * @param bool[optional] $overwrite
+	 * @return mixed
 	 */
 	public static function getData($group, $id, $overwrite = false)
 	{
@@ -232,6 +234,7 @@ class Cache
 	 * @param string $type
 	 * @param string $group
 	 * @param int $id
+	 * @return mixed
 	 */
 	private static function read($type, $group, $id)
 	{
@@ -314,6 +317,7 @@ class Cache
 	 * @param int $id
 	 * @param bool[optional] $lifetime
 	 * @param bool[optional] $overwrite
+	 * @return bool
 	 */
 	public static function start($group, $id, $lifetime = false, $overwrite = false)
 	{
@@ -356,6 +360,7 @@ class Cache
 	 * Serialize
 	 *
 	 * @param mixed $data
+	 * @return string 
 	 */
 	public static function serialize($data)
 	{
@@ -391,6 +396,7 @@ class Cache
 	 * Unserialize
 	 *
 	 * @param mixed $data
+	 * @return array
 	 */
 	public static function unserialize($data)
 	{
@@ -425,7 +431,7 @@ class Cache
 	 * @param string $type
 	 * @param string $group
 	 * @param int $id
-	 * @param mixed $data
+	 * @param mixed $content
 	 * @param mixed[optional] $lifetime
 	 */
 	private static function write($type, $group, $id, $data, $lifetime = false)
@@ -437,7 +443,7 @@ class Cache
 			mkdir(self::getCachePath() . $group . '/', 0777, true);
 		}
 
-		// define filePath
+		// define file path
 		$filePath = self::getCachePathToFile($type, $group, $id);
 
 		// define file stream
@@ -450,8 +456,10 @@ class Cache
 		// close file stream
 		fclose($fh);
 
-		// set filemtime
+		// define file lifetime
 		$lifetime = ($lifetime) ? $lifetime : CACHE_TIME;
+
+		// set file lifetime
 		touch($filePath, time() + $lifetime);
 	}
 }
