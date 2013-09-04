@@ -20,13 +20,15 @@ class Cache
 	const CACHE_EXTENSION = '.php';
 
 	// cache security key
-	const CACHE_SECURITY = 'D15sdf8szefs698df15sd7';
+	const CACHE_SECURITY = 'd15sdf8szefs698df15sd7';
 
 	// cache will be kept so long (in seconds)
 	const CACHE_TIME = 60;
 
-	// types
+	// cache is data
 	const IS_DATA = 'data';
+
+	// cache is output
 	const IS_OUTPUT = 'view';
 
 	/**
@@ -111,7 +113,7 @@ class Cache
 	public static function exists($type, $group, $id)
 	{
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(self::isCacheEnabled())
 		{
 			// define cache file path
 			$cacheFilePath = self::getCachePathToFile($type, $group, $id);
@@ -174,7 +176,7 @@ class Cache
 		$enc = md5(CACHE_SECURITY . $id);
 
 		// return path to the cached file
-		return self::getCachePath() . $group . '/' . "{$enc}_{$type}" . self::$cacheExtension;
+		return self::getCachePath() . $group . '/' . "{$enc}_{$type}" . self::$cache['extension'];
 	}
 
 	/**
@@ -188,7 +190,7 @@ class Cache
 	public static function getData($group, $id, $overwrite = false)
 	{
 		// cache is enabled, data-file exists and it should not be overridden
-		if(self::$cache['enabled'] && !$overwrite && self::exists(IS_DATA, $group, $id))
+		if(self::isCacheEnabled() && !$overwrite && self::exists(IS_DATA, $group, $id))
 		{
 			// we return the cached data-file
 			return self::unserialize(self::read(IS_DATA, $group, $id));
@@ -196,6 +198,23 @@ class Cache
 
 		// otherwise return false
 		return false;
+	}
+
+	/**
+	 * Is cache enabled
+	 *
+	 * @return bool
+	 */
+	public static function isCacheEnabled()
+	{
+		// cache enabled not set
+		if(!isset(self::$cache['enabled']))
+		{
+			// redefine and enable cache
+			self::$cache['enabled'] = true;
+		}
+
+		return self::$cache['enabled'];
 	}
 
 	/**
@@ -273,7 +292,7 @@ class Cache
 	public static function setData($group, $id, $data, $lifetime = false)
 	{
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(self::isCacheEnabled())
 		{
 			// we should write data to a cache file
 			self::write(IS_DATA, $group, $id, self::serialize($data), $lifetime);
@@ -298,7 +317,7 @@ class Cache
 		if((bool) CACHE_DEBUG) $overwrite = true;
 
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(self::isCacheEnabled())
 		{
 			// cache exists and we should not override
 			if(self::exists(IS_OUTPUT, $group, $id) && !$overwrite)
@@ -318,7 +337,7 @@ class Cache
 				self::$cache['group'] = $group;
 				self::$cache['id'] = $id;
 				self::$cache['time'] = ($lifetime) ? $lifetime : CACHE_TIME;
-				self::$cache['output'] = (bool) !CACHE_DEBUG;
+				self::$cache['output'] = true; // !CACHE_DEBUG didn't worked
 			}
 		}
 
@@ -332,7 +351,7 @@ class Cache
 	public static function stop()
 	{
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(self::isCacheEnabled())
 		{
 			// we should save output
 			if(self::$cache['output'])

@@ -22,10 +22,10 @@ $data = array(
 //Cache::setCacheExtension('.cache');
 
 // set data to cache
-Cache::setData('blog', 'articles', $data);
+// Cache::setData('blog', 'articles', $data);
 
 // get data from cache
-$items = Cache::getData('blog', 'articles');
+// $items = Cache::getData('blog', 'articles');
 
 // start caching
 Cache::start('home-page', 'widget-recent-blog-articles-nl');
