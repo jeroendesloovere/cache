@@ -59,27 +59,42 @@ class Cache
 	 */
 	private static function convertToObject($data)
 	{
+		// define new class
 		$obj = new stdclass();
-		
+
+		// data is an object
 		if(is_object($data))
 		{
+			// loop data
 			foreach($data as $key => $value)
 			{
+				// add key to object
 				$obj->$key = self::convertToObject($value);
 			}
 		}
+
+		// data is an array
 		elseif(is_array($data))
 		{
+			// define keys
 			$keys = array_keys($data);
+
+			// we have keys
 			if(count($keys)>0)
 			{
+				// loop keys
 				foreach($keys as $key)
 				{
+					// add key to object
 					$obj->$key = self::convertToObject($data[$key]);
 				}
 			}
 		}
+
+		// else set data as object
 		else $obj = $data;
+
+		// return object
 		return $obj;
 	}
 
