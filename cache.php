@@ -102,30 +102,6 @@ class Cache
 	}
 
 	/**
-	 * End reached for saving output to cache
-	 */
-	public static function end()
-	{
-		// cache is enabled
-		if(self::$cache['enabled'])
-		{
-			// we should save output
-			if(self::$cache['output'])
-			{
-				// get page content from memory
-				$content = ob_get_contents();
-
-				// save content to a cache file
-				self::write(IS_OUTPUT, self::$cache['group'], self::$cache['id'], $content, self::$cache['time']);
-			}
-
-			// show output
-			ob_end_flush();
-			flush();
-		}
-	}
-
-	/**
 	 * Does cache exists?
 	 *
 	 * @param string $type
@@ -191,8 +167,10 @@ class Cache
 	 */
 	private static function getCachePathToFile($type, $group, $id)
 	{
-		// get encrypted filename
+		// get id for filename
 		$id = (is_array($id)) ? implode('_', $id) : $id;
+
+		// get encrypted id
 		$enc = md5(CACHE_SECURITY . $id);
 
 		// return path to the cached file
@@ -346,6 +324,30 @@ class Cache
 
 		// return true
 		return true;
+	}
+
+	/**
+	 * Stop saving output to cache
+	 */
+	public static function stop()
+	{
+		// cache is enabled
+		if(self::$cache['enabled'])
+		{
+			// we should save output
+			if(self::$cache['output'])
+			{
+				// get page content from memory
+				$content = ob_get_contents();
+
+				// save content to a cache file
+				self::write(IS_OUTPUT, self::$cache['group'], self::$cache['id'], $content, self::$cache['time']);
+			}
+
+			// show output
+			ob_end_flush();
+			flush();
+		}
 	}
 
 	/**
