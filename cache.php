@@ -434,7 +434,7 @@ class Cache
 	 * @param mixed $content
 	 * @param mixed[optional] $lifetime
 	 */
-	private static function write($type, $group, $id, $data, $lifetime = false)
+	private static function write($type, $group, $id, $content, $lifetime = false)
 	{
 		// directory not exists
 		if(!is_dir(self::getCachePath() . $group . '/'))
@@ -449,9 +449,11 @@ class Cache
 		// define file stream
 		$fh = fopen($filePath,'w');
 
-		// set data to file
-		if(CACHE_COMPRESSION && function_exists('gzcompress')) $data = gzcompress($data, CACHE_COMPRESSION_LEVEL);
-		fwrite($fh, $data);
+		// compress content when necessairy
+		if(CACHE_COMPRESSION && function_exists('gzcompress')) $content = gzcompress($content, CACHE_COMPRESSION_LEVEL);
+
+		// write data to file
+		fwrite($fh, $content);
 
 		// close file stream
 		fclose($fh);
