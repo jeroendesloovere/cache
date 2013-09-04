@@ -7,6 +7,9 @@
  */
 class Cache
 {
+	// cache enabled
+	const CACHE = true;
+
 	// cache compression
 	const CACHE_COMPRESSION = false;
 
@@ -111,7 +114,7 @@ class Cache
 	public static function exists($type, $group, $id)
 	{
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(CACHE)
 		{
 			// define cache file path
 			$cacheFilePath = self::getCachePathToFile($type, $group, $id);
@@ -188,7 +191,7 @@ class Cache
 	public static function getData($group, $id, $overwrite = false)
 	{
 		// cache is enabled, data-file exists and it should not be overridden
-		if(self::$cache['enabled'] && !$overwrite && self::exists(IS_DATA, $group, $id))
+		if(CACHE && !$overwrite && self::exists(IS_DATA, $group, $id))
 		{
 			// we return the cached data-file
 			return self::unserialize(self::read(IS_DATA, $group, $id));
@@ -273,7 +276,7 @@ class Cache
 	public static function setData($group, $id, $data, $lifetime = false)
 	{
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(CACHE)
 		{
 			// we should write data to a cache file
 			self::write(IS_DATA, $group, $id, self::serialize($data), $lifetime);
@@ -298,7 +301,7 @@ class Cache
 		if((bool) CACHE_DEBUG) $overwrite = true;
 
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(CACHE)
 		{
 			// cache exists and we should not override
 			if(self::exists(IS_OUTPUT, $group, $id) && !$overwrite)
@@ -332,7 +335,7 @@ class Cache
 	public static function stop()
 	{
 		// cache is enabled
-		if(self::$cache['enabled'])
+		if(CACHE)
 		{
 			// we should save output
 			if(self::$cache['output'])
