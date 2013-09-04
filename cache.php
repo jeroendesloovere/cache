@@ -4,56 +4,44 @@
  * Cache
  *
  * @author Jeroen Desloovere <jeroen@siesqo.be>
- * @version 0.0.1
  */
 class Cache
 {
-	// version
-	const VERSION = '0.0.1';
+	// cache compression
+	const CACHE_COMPRESSION = false;
 
-	// security key
-	const SECURITY_KEY = 'D15sdf8szefs698df15sd7';
+	// cache compression level
+	const CACHE_COMPRESSION_LEVEL = 9;
+
+	// cache debug
+	const CACHE_DEBUG = false;
+
+	// cache file extension
+	const CACHE_EXTENSION = '.php';
+
+	// cache security key
+	const CACHE_SECURITY = 'D15sdf8szefs698df15sd7';
+
+	// cache will be kept so long (in seconds)
+	const CACHE_TIME = 60;
 
 	// types
 	const IS_DATA = 'data';
 	const IS_OUTPUT = 'view';
 
 	/**
-	 * Is cache enabled? If not, nothing will be cached
+	 * All settings for cache will be saved here
 	 *
-	 * @var bool
+	 * @var array
 	 */
-	protected static $cacheEnabled = true;
-
-	/**
-	 * Cache path
-	 *
-	 * @var string
-	 */
-	protected static $cachePath;
-
-	// Compress: false or 0->9 value
-	public static $compress = false;
-	public static $compress_level = 9;
-
-	// File extension
-	public static $file_extension = '.php';
-
-	// Time to last of currently being recorded data
-	public static $lifetime = 60;
-	
-	// Cache output
-	private static $cache_output; // Boolean
-	private static $group;
-	private static $id;
-	private static $lifetime_output;
+	protected static $cache;
 
 	/**
 	 * Cancel saving output to cache
 	 */
 	public static function cancel()
 	{
-		self::$cache_output = false;
+		self::$cache['output'] = false;
 	}
 
 	/**
@@ -69,7 +57,7 @@ class Cache
 	 *
 	 * @param mixed $data
 	 */
-	public static function convertToObject($data)
+	private static function convertToObject($data)
 	{
 		$obj = new stdclass();
 		
@@ -102,6 +90,7 @@ class Cache
 	 */
 	private static function delete($filePath)
 	{
+		// delete file if exists
 		if(file_exists($filePath)) @unlink($filePath);
 	}
 
@@ -110,13 +99,20 @@ class Cache
 	 */
 	public static function end()
 	{
-		if(self::$cacheEnabled)
+		// cache is enabled
+		if(self::$cache['enabled'])
 		{
-			if(self::$cache_output)
+			// we should save output
+			if(self::$cache['output'])
 			{
-				$data = ob_get_contents();
-				self::write(IS_OUTPUT, self::$group, self::$id, $data, self::$lifetime_output);
+				// get page content from memory
+				$content = ob_get_contents();
+
+				// save content to a cache file
+				self::write(IS_OUTPUT, self::$cache['group'], self::$cache['id'], $content, self::$cache['time']);
 			}
+
+			// show output
 			ob_end_flush();
 			flush();
 		}
@@ -131,30 +127,70 @@ class Cache
 	 */
 	public static function exists($type, $group, $id)
 	{
-		if(self::$cacheEnabled)
+		// cache is enabled
+		if(self::$cache['enabled'])
 		{
-			$filePath = self::getFilePath($type, $group, $id);
-			if(file_exists($filePath) && filemtime($filePath) > time()) return true;
+			// define cache file path
+			$cacheFilePath = self::getCachePathToFile($type, $group, $id);
+
+			// it exists and is not yet over-time
+			if(file_exists($cacheFilePath) && filemtime($cacheFilePath) > time()) return true;
 		}
 
 		return false;
 	}
 
 	/**
-	 * Get cache path
+	 * Get cache extension
+	 *
+	 * @return string
+	 */
+	private static function getCacheExtension()
+	{
+		// if no cache extension set
+		if(!isset(self::$cache['extension']))
+		{
+			// define to the default cache extension
+			self::setCacheExtension(CACHE_EXTENSION);	
+		}
+
+		return self::$cache['extension'];
+	}
+
+	/**
+	 * Get cache path where the caches will be saved to
+	 *
+	 * @return string
 	 */
 	public static function getCachePath()
 	{
 		// cache path not defined
-		if(self::$cachePath == null)
+		if(self::$cache['path'] == null)
 		{
-			// redefine cache path
+			// redefine cache path to default path
 			self::setCachePath($_SERVER['DOCUMENT_ROOT'] . '/cache/');	
 		}
 
-		return self::$cachePath;
+		return self::$cache['path'];
 	}
-	
+
+	/**
+	 * Get path to the cached file
+	 *
+	 * @param string $type
+	 * @param string $group
+	 * @param int $id
+	 */
+	private static function getCachePathToFile($type, $group, $id)
+	{
+		// get encrypted filename
+		$id = (is_array($id)) ? implode('_', $id) : $id;
+		$enc = md5(CACHE_SECURITY . $id);
+
+		// return path to the cached file
+		return self::getCachePath() . $group . '/' . "{$enc}_{$type}" . self::$cacheExtension;
+	}
+
 	/**
 	 * Get data from cache
 	 *
@@ -164,29 +200,15 @@ class Cache
 	 */
 	public static function getData($group, $id, $overwrite = false)
 	{
-		if(self::$cacheEnabled && !$overwrite && self::exists(IS_DATA, $group, $id))
+		// cache is enabled, data-file exists and it should not be overridden
+		if(self::$cache['enabled'] && !$overwrite && self::exists(IS_DATA, $group, $id))
 		{
+			// we return the cached data-file
 			return self::unserialize(self::read(IS_DATA, $group, $id));
 		}
 
+		// otherwise return false
 		return false;
-	}
-
-	/**
-	 * Get filePath
-	 *
-	 * @param string $type
-	 * @param string $group
-	 * @param int $id
-	 */
-	private static function getFilePath($type, $group, $id)
-	{
-		// Get encrypted filename
-		$id = (is_array($id)) ? implode('_', $id) : $id;	
-		$enc = md5(SECURITY_KEY . $id);
-
-		// return filePath
-		return self::getCachePath() . $group . '/' . "{$enc}_{$type}" . self::$file_extension;
 	}
 
 	/**
@@ -198,18 +220,47 @@ class Cache
 	 */
 	private static function read($type, $group, $id)
 	{
-		$filePath = self::getFilePath($type, $group, $id);
+		// define cache file path
+		$cacheFilePath = self::getCachePathToFile($type, $group, $id);
+
+		// cache already exists
 		if(self::exists($type, $group, $id))
 		{
-			$data = file_get_contents($filePath);
-			if(self::$compress&&function_exists('gzuncompress')) $data = gzuncompress($data);
-			return $data;
+			// get content from existing cache
+			$content = file_get_contents($cacheFilePath);
+
+			// uncompress if necessairy
+			if(CACHE_COMPRESSION && function_exists('gzuncompress')) $content = gzuncompress($content);
+
+			// return content
+			return $content;
 		}
 
-		// delete
-		self::delete($filePath);
+		// delete cache
+		self::delete($cacheFilePath);
 
+		// return false
 		return false;
+	}
+
+	/**
+	 * Set cache extension
+	 *
+	 * @param string $extension
+	 */
+	public static function setCacheExtension($extension)
+	{
+		// redefine
+		$extension = (string) $extension;
+
+		// throw error when '.' not found
+		if(strpos($extension, '.') === false)
+		{
+			throw new CacheException('The extension should contain a point.');	
+		}
+
+		// redefine cache extension
+		self::$cache['extension'] = $extension;
 	}
 
 	/**
@@ -220,7 +271,7 @@ class Cache
 	public static function setCachePath($path)
 	{
 		// redefine cache path
-		self::$cachePath = (string) $path;
+		self::$cache['path'] = (string) $path;
 	}
 
 	/**
@@ -233,8 +284,10 @@ class Cache
 	 */
 	public static function setData($group, $id, $data, $lifetime = false)
 	{
-		if(self::$cacheEnabled)
+		// cache is enabled
+		if(self::$cache['enabled'])
 		{
+			// we should write data to a cache file
 			self::write(IS_DATA, $group, $id, self::serialize($data), $lifetime);
 		}
 	}
@@ -249,24 +302,38 @@ class Cache
 	 */
 	public static function start($group, $id, $lifetime = false, $overwrite = false)
 	{
-		self::$cache_output = false;
-		if((bool)DEBUG) $overwrite = true;
-		if(self::$cacheEnabled)
+		// define output per default as false
+		self::$cache['output'] = false;
+
+		// always override if debug is true
+		if((bool) CACHE_DEBUG) $overwrite = true;
+
+		// cache is enabled
+		if(self::$cache['enabled'])
 		{
-			if(!$overwrite && self::exists(IS_OUTPUT, $group, $id))
+			// cache exists and we should not override
+			if(self::exists(IS_OUTPUT, $group, $id) && !$overwrite)
 			{
+				// read in cache and output it
 				echo self::read(IS_OUTPUT, $group, $id);
 				return false;
 			}
+
+			// cache doesn't exists or we should override it
 			else
 			{
-				ob_start();					
-				self::$group = $group;
-				self::$id = $id;
-				self::$lifetime_output = ($lifetime) ? $lifetime : self::$lifetime;
-				self::$cache_output = (bool)!DEBUG;
+				// start fetching output
+				ob_start();	
+
+				// redefine variables				
+				self::$cache['group'] = $group;
+				self::$cache['id'] = $id;
+				self::$cache['time'] = ($lifetime) ? $lifetime : CACHE_TIME;
+				self::$cache['output'] = (bool) !CACHE_DEBUG;
 			}
 		}
+
+		// return true
 		return true;
 	}
 
@@ -277,21 +344,31 @@ class Cache
 	 */
 	public static function serialize($data)
 	{
+		// is object
 		if(is_object($data))
 		{
 			$data = self::convertToObject($data);
 		}
+
+		// is array
 		elseif(is_array($data))
 		{
+			// define keys from array
 			$keys = array_keys($data);
-			if(count($keys)>0)
+
+			// we have keys
+			if(count($keys) > 0)
 			{
+				// loop keys
 				foreach($keys as $key)
 				{
+					// add key and its serialized data
 					$data[$key] = self::serialize($data[$key]);
 				}
 			}
 		}
+
+		// return serialized data
 		return serialize($data);
 	}
 	
@@ -302,19 +379,28 @@ class Cache
 	 */
 	public static function unserialize($data)
 	{
+		// unserialize data
 		$data = unserialize($data);
-		
+
+		// data is array
 		if(is_array($data))
 		{
+			// define keys
 			$keys = array_keys($data);
+
+			// we have keys
 			if(count($keys)>0)
 			{
+				// loop keys
 				foreach($keys as $key)
 				{
+					// add key and its unserialized data
 					$data[$key] = self::unserialize($data[$key]);
 				}
 			}
 		}
+
+		// return unserialized data
 		return $data;
 	}
 
@@ -337,20 +423,20 @@ class Cache
 		}
 
 		// define filePath
-		$filePath = self::getFilePath($type, $group, $id);
+		$filePath = self::getCachePathToFile($type, $group, $id);
 
 		// define file stream
 		$fh = fopen($filePath,'w');
 
 		// set data to file
-		if(self::$compress&&function_exists('gzcompress')) $data = gzcompress($data, self::$compress_level);
+		if(CACHE_COMPRESSION && function_exists('gzcompress')) $data = gzcompress($data, CACHE_COMPRESSION_LEVEL);
 		fwrite($fh, $data);
 
 		// close file stream
 		fclose($fh);
 
 		// set filemtime
-		$lifetime = ($lifetime) ? $lifetime : self::$lifetime;
+		$lifetime = ($lifetime) ? $lifetime : CACHE_TIME;
 		touch($filePath, time() + $lifetime);
 	}
 }
