@@ -136,7 +136,7 @@ class Cache
 		if(!isset(self::$cache['extension']))
 		{
 			// define to the default cache extension
-			self::setCacheExtension(CACHE_EXTENSION);	
+			self::setCacheExtension(self::CACHE_EXTENSION);	
 		}
 
 		return self::$cache['extension'];
@@ -169,14 +169,14 @@ class Cache
 	 */
 	private static function getCachePathToFile($type, $group, $id)
 	{
-		// get id for filename
+		// define id for filename
 		$id = (is_array($id)) ? implode('_', $id) : $id;
 
-		// get encrypted id
-		$enc = md5(CACHE_SECURITY . $id);
+		// define encrypted id
+		$encryptedId = md5(self::CACHE_SECURITY . $id);
 
 		// return path to the cached file
-		return self::getCachePath() . $group . '/' . "{$enc}_{$type}" . self::$cache['extension'];
+		return self::getCachePath() . $group . '/' . $encryptedId . $type . self::getCacheExtension();
 	}
 
 	/**
@@ -190,10 +190,10 @@ class Cache
 	public static function getData($group, $id, $overwrite = false)
 	{
 		// cache is enabled, data-file exists and it should not be overridden
-		if(self::isCacheEnabled() && !$overwrite && self::exists(IS_DATA, $group, $id))
+		if(self::isCacheEnabled() && !$overwrite && self::exists(self::IS_DATA, $group, $id))
 		{
 			// we return the cached data-file
-			return self::unserialize(self::read(IS_DATA, $group, $id));
+			return self::unserialize(self::read(self::IS_DATA, $group, $id));
 		}
 
 		// otherwise return false
@@ -237,7 +237,7 @@ class Cache
 			$content = file_get_contents($cacheFilePath);
 
 			// uncompress if necessairy
-			if(CACHE_COMPRESSION && function_exists('gzuncompress')) $content = gzuncompress($content);
+			if(self::CACHE_COMPRESSION && function_exists('gzuncompress')) $content = gzuncompress($content);
 
 			// return content
 			return $content;
@@ -295,7 +295,7 @@ class Cache
 		if(self::isCacheEnabled())
 		{
 			// we should write data to a cache file
-			self::write(IS_DATA, $group, $id, self::serialize($data), $lifetime);
+			self::write(self::IS_DATA, $group, $id, self::serialize($data), $lifetime);
 		}
 	}
 
@@ -314,16 +314,16 @@ class Cache
 		self::$cache['output'] = false;
 
 		// always override if debug is true
-		if((bool) CACHE_DEBUG) $overwrite = true;
+		if((bool) self::CACHE_DEBUG) $overwrite = true;
 
 		// cache is enabled
 		if(self::isCacheEnabled())
 		{
 			// cache exists and we should not override
-			if(self::exists(IS_OUTPUT, $group, $id) && !$overwrite)
+			if(self::exists(self::IS_OUTPUT, $group, $id) && !$overwrite)
 			{
 				// read in cache and output it
-				echo self::read(IS_OUTPUT, $group, $id);
+				echo self::read(self::IS_OUTPUT, $group, $id);
 				return false;
 			}
 
@@ -336,8 +336,8 @@ class Cache
 				// redefine variables				
 				self::$cache['group'] = $group;
 				self::$cache['id'] = $id;
-				self::$cache['time'] = ($lifetime) ? $lifetime : CACHE_TIME;
-				self::$cache['output'] = true; // !CACHE_DEBUG didn't worked
+				self::$cache['time'] = ($lifetime) ? $lifetime : self::CACHE_TIME;
+				self::$cache['output'] = !self::CACHE_DEBUG;
 			}
 		}
 
@@ -360,7 +360,7 @@ class Cache
 				$content = ob_get_contents();
 
 				// save content to a cache file
-				self::write(IS_OUTPUT, self::$cache['group'], self::$cache['id'], $content, self::$cache['time']);
+				self::write(self::IS_OUTPUT, self::$cache['group'], self::$cache['id'], $content, self::$cache['time']);
 			}
 
 			// show output
@@ -463,7 +463,7 @@ class Cache
 		$fh = fopen($filePath,'w');
 
 		// compress content when necessairy
-		if(CACHE_COMPRESSION && function_exists('gzcompress')) $content = gzcompress($content, CACHE_COMPRESSION_LEVEL);
+		if(self::CACHE_COMPRESSION && function_exists('gzcompress')) $content = gzcompress($content, self::CACHE_COMPRESSION_LEVEL);
 
 		// write data to file
 		fwrite($fh, $content);
@@ -472,7 +472,7 @@ class Cache
 		fclose($fh);
 
 		// define file lifetime
-		$lifetime = ($lifetime) ? $lifetime : CACHE_TIME;
+		$lifetime = ($lifetime) ? $lifetime : self::CACHE_TIME;
 
 		// set file lifetime
 		touch($filePath, time() + $lifetime);

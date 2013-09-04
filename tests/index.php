@@ -26,10 +26,10 @@ $data = array(
 
 // get data from cache
 // $items = Cache::getData('blog', 'articles');
-
-// start caching
-Cache::start('home-page', 'widget-recent-blog-articles-nl');
 ?>
+
+<?php if(Cache::start('home-page', 'widget-recent-blog-articles-nl')):?>
+
 <!doctype html>
 <html>
 <head>
@@ -48,7 +48,5 @@ Cache::start('home-page', 'widget-recent-blog-articles-nl');
 	<?php endif;?>
 </body>
 </html>
-<?php
 
-// stop caching
-Cache::stop();
+<?php Cache::stop(); endif;?>
