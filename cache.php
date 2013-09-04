@@ -45,14 +45,6 @@ class Cache
 	}
 
 	/**
-	 * Clear all saved caches
-	 * @todo
-	 */
-	private static function clear()
-	{
-	}
-
-	/**
 	 * Convert to object
 	 *
 	 * @param mixed $data
