@@ -11,9 +11,19 @@ class Cache
 	// version
 	const VERSION = '0.0.1';
 
+	// security key
+	const SECURITY_KEY = 'D15sdf8szefs698df15sd7';
+
 	// types
 	const IS_DATA = 'data';
 	const IS_OUTPUT = 'view';
+
+	/**
+	 * Is cache enabled? If not, nothing will be cached
+	 *
+	 * @var bool
+	 */
+	protected static $cacheEnabled = true;
 
 	/**
 	 * Cache path
@@ -21,13 +31,6 @@ class Cache
 	 * @var string
 	 */
 	protected static $cachePath;
-
-	/**
-	 * Is cache enabled
-	 *
-	 * @var bool
-	 */
-	public static $enabled = true;
 
 	// Compress: false or 0->9 value
 	public static $compress = false;
@@ -63,6 +66,8 @@ class Cache
 
 	/**
 	 * Convert to object
+	 *
+	 * @param mixed $data
 	 */
 	public static function convertToObject($data)
 	{
@@ -105,7 +110,7 @@ class Cache
 	 */
 	public static function end()
 	{
-		if(self::$enabled)
+		if(self::$cacheEnabled)
 		{
 			if(self::$cache_output)
 			{
@@ -126,11 +131,12 @@ class Cache
 	 */
 	public static function exists($type, $group, $id)
 	{
-		if(self::$enabled)
+		if(self::$cacheEnabled)
 		{
 			$filePath = self::getFilePath($type, $group, $id);
 			if(file_exists($filePath) && filemtime($filePath) > time()) return true;
 		}
+
 		return false;
 	}
 
@@ -158,9 +164,9 @@ class Cache
 	 */
 	public static function getData($group, $id, $overwrite = false)
 	{
-		if(self::$enabled && !$overwrite && self::exists(IS_DATA, $group, $id))
+		if(self::$cacheEnabled && !$overwrite && self::exists(IS_DATA, $group, $id))
 		{
-			return Data::unserialize(self::read(IS_DATA, $group, $id));
+			return self::unserialize(self::read(IS_DATA, $group, $id));
 		}
 
 		return false;
@@ -176,11 +182,11 @@ class Cache
 	private static function getFilePath($type, $group, $id)
 	{
 		// Get encrypted filename
-		$id = (is_array($id)) ? implode('_',$id) : $id;	
-		$enc = md5(SECURITY_KEY.$id);
+		$id = (is_array($id)) ? implode('_', $id) : $id;	
+		$enc = md5(SECURITY_KEY . $id);
 
 		// return filePath
-		return self::$cachePath.$group.'/'."{$enc}_{$type}".self::$file_extension;
+		return self::getCachePath() . $group . '/' . "{$enc}_{$type}" . self::$file_extension;
 	}
 
 	/**
@@ -199,7 +205,8 @@ class Cache
 			if(self::$compress&&function_exists('gzuncompress')) $data = gzuncompress($data);
 			return $data;
 		}
-	
+
+		// delete
 		self::delete($filePath);
 
 		return false;
@@ -214,9 +221,6 @@ class Cache
 	{
 		// redefine cache path
 		self::$cachePath = (string) $path;
-
-		// create folder if not exists
-		// @todo
 	}
 
 	/**
@@ -229,9 +233,9 @@ class Cache
 	 */
 	public static function setData($group, $id, $data, $lifetime = false)
 	{
-		if(self::$enabled)
+		if(self::$cacheEnabled)
 		{
-			self::write(IS_DATA, $group, $id, Data::serialize($data), $lifetime);
+			self::write(IS_DATA, $group, $id, self::serialize($data), $lifetime);
 		}
 	}
 
@@ -247,7 +251,7 @@ class Cache
 	{
 		self::$cache_output = false;
 		if((bool)DEBUG) $overwrite = true;
-		if(self::$enabled)
+		if(self::$cacheEnabled)
 		{
 			if(!$overwrite && self::exists(IS_OUTPUT, $group, $id))
 			{
@@ -326,10 +330,10 @@ class Cache
 	private static function write($type, $group, $id, $data, $lifetime = false)
 	{
 		// directory not exists
-		if(!is_dir(self::$cachePath.$group.'/'))
+		if(!is_dir(self::getCachePath() . $group . '/'))
 		{
 			// create directory
-			mkdir(self::$cachePath.$group.'/',0777,true);
+			mkdir(self::getCachePath() . $group . '/', 0777, true);
 		}
 
 		// define filePath
@@ -340,7 +344,7 @@ class Cache
 
 		// set data to file
 		if(self::$compress&&function_exists('gzcompress')) $data = gzcompress($data, self::$compress_level);
-		fwrite($fh,$data);
+		fwrite($fh, $data);
 
 		// close file stream
 		fclose($fh);
