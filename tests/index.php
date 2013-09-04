@@ -22,10 +22,10 @@ $data = array(
 //Cache::setCacheExtension('.cache');
 
 // set data to cache
-// Cache::setData('blog', 'articles', $data);
+Cache::setData('blog', 'articles', $data);
 
 // get data from cache
-// $items = Cache::getData('blog', 'articles');
+$items = Cache::getData('blog', 'articles');
 ?>
 
 <?php if(Cache::start('home-page', 'widget-recent-blog-articles-nl')):?>
@@ -39,9 +39,9 @@ $data = array(
 <body>
 	<p>Test-output</p>
 	
-	<?php if(isset($data)):?>
+	<?php if(isset($items)):?>
 		<ul>
-		<?php foreach($data as $item):?>
+		<?php foreach($items as $item):?>
 			<li><?php echo $item['id'] . '-' . $item['text'];?></li>
 		<?php endforeach;?>
 		</ul>
