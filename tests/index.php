@@ -1,7 +1,7 @@
 <?php
 
 // require
-require_once('../cache.php');
+require_once('../src/Cache/Cache.php');
 
 // define dummy data
 $data = array(
