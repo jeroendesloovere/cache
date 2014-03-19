@@ -1,5 +1,7 @@
 <?php
 
+namespace JeroenDesloovere\Cache;
+
 /**
  * Cache
  *
