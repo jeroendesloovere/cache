@@ -1,18 +1,18 @@
 <?php
 
 // require
-require_once('../src/JeroenDesloovere/Cache/Cache.php');
+require_once '../src/JeroenDesloovere/Cache/Cache.php';
 
 // define dummy data
 $data = array(
-	array(
-		'id' => 1,
-		'text' => 'first item'
-	),
-	array(
-		'id' => 2,
-		'text' => 'second item'
-	)
+    array(
+        'id' => 1,
+        'text' => 'first item'
+    ),
+    array(
+        'id' => 2,
+        'text' => 'second item'
+    )
 );
 
 // [optional] set the path where the cache should be saved to
@@ -37,15 +37,15 @@ $items = Cache::getData('blog', 'articles');
 <title>Cache PHP class test</title>
 </head>
 <body>
-	<p>Test-output</p>
-	
-	<?php if(isset($items)):?>
-		<ul>
-		<?php foreach($items as $item):?>
-			<li><?php echo $item['id'] . '-' . $item['text'];?></li>
-		<?php endforeach;?>
-		</ul>
-	<?php endif;?>
+    <p>Test-output</p>
+
+    <?php if(isset($items)):?>
+        <ul>
+        <?php foreach($items as $item):?>
+            <li><?php echo $item['id'] . '-' . $item['text'];?></li>
+        <?php endforeach;?>
+        </ul>
+    <?php endif;?>
 </body>
 </html>
 

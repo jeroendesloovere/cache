@@ -127,7 +127,7 @@ class Cache
         // if no cache extension set
         if (!isset(self::$cache['extension'])) {
             // define to the default cache extension
-            self::setCacheExtension(self::CACHE_EXTENSION);    
+            self::setCacheExtension(self::CACHE_EXTENSION);
         }
 
         return self::$cache['extension'];
@@ -143,7 +143,7 @@ class Cache
         // cache path not defined
         if (self::$cache['path'] == null) {
             // redefine cache path to default path
-            self::setCachePath($_SERVER['DOCUMENT_ROOT'] . '/cache/');    
+            self::setCachePath($_SERVER['DOCUMENT_ROOT'] . '/cache/');
         }
 
         return self::$cache['path'];
@@ -152,9 +152,9 @@ class Cache
     /**
      * Get path to the cached file
      *
-     * @param string $type
-     * @param string $folder
-     * @param string $name
+     * @param  string $type
+     * @param  string $folder
+     * @param  string $name
      * @return string
      */
     private static function getCachePathToFile($type, $folder, $name)
@@ -172,9 +172,9 @@ class Cache
     /**
      * Get data from cache
      *
-     * @param string $folder
-     * @param string $name
-     * @param bool[optional] $overwrite
+     * @param  string         $folder
+     * @param  string         $name
+     * @param  bool[optional] $overwrite
      * @return mixed
      */
     public static function getData($folder, $name, $overwrite = false)
@@ -208,9 +208,9 @@ class Cache
     /**
      * Read cache
      *
-     * @param string $type
-     * @param string $folder
-     * @param string $name
+     * @param  string $type
+     * @param  string $folder
+     * @param  string $name
      * @return mixed
      */
     private static function read($type, $folder, $name)
@@ -249,7 +249,7 @@ class Cache
 
         // throw error when '.' not found
         if (strpos($extension, '.') === false) {
-            throw new CacheException('The extension should contain a point.');    
+            throw new CacheException('The extension should contain a point.');
         }
 
         // redefine cache extension
@@ -270,9 +270,9 @@ class Cache
     /**
      * Set data in cache
      *
-     * @param string $folder
-     * @param string $name
-     * @param mixed $data
+     * @param string         $folder
+     * @param string         $name
+     * @param mixed          $data
      * @param bool[optional] $lifetime
      */
     public static function setData($folder, $name, $data, $lifetime = false)
@@ -287,10 +287,10 @@ class Cache
     /**
      * Start saving output to cache
      *
-     * @param string $folder
-     * @param string $name
-     * @param bool[optional] $lifetime
-     * @param bool[optional] $overwrite
+     * @param  string         $folder
+     * @param  string         $name
+     * @param  bool[optional] $lifetime
+     * @param  bool[optional] $overwrite
      * @return bool
      */
     public static function start($folder, $name, $lifetime = false, $overwrite = false)
@@ -307,13 +307,14 @@ class Cache
             if (self::exists(self::IS_OUTPUT, $folder, $name) && !$overwrite) {
                 // read in cache and output it
                 echo self::read(self::IS_OUTPUT, $folder, $name);
+
                 return false;
             // cache doesn't exists or we should override it
             } else {
                 // start fetching output
-                ob_start();    
+                ob_start();
 
-                // redefine variables                
+                // redefine variables
                 self::$cache['folder'] = $folder;
                 self::$cache['name'] = $name;
                 self::$cache['time'] = ($lifetime) ? $lifetime : self::CACHE_TIME;
@@ -350,8 +351,8 @@ class Cache
     /**
      * Serialize
      *
-     * @param mixed $data
-     * @return string 
+     * @param  mixed  $data
+     * @return string
      */
     public static function serialize($data)
     {
@@ -376,11 +377,11 @@ class Cache
         // return serialized data
         return serialize($data);
     }
-    
+
     /**
      * Unserialize
      *
-     * @param mixed $data
+     * @param  mixed $data
      * @return array
      */
     public static function unserialize($data)
@@ -410,10 +411,10 @@ class Cache
     /**
      * Write
      *
-     * @param string $type
-     * @param string $folder
-     * @param string $name
-     * @param mixed $content
+     * @param string          $type
+     * @param string          $folder
+     * @param string          $name
+     * @param mixed           $content
      * @param mixed[optional] $lifetime
      */
     private static function write($type, $folder, $name, $content, $lifetime = false)
@@ -446,7 +447,6 @@ class Cache
         touch($filePath, time() + $lifetime);
     }
 }
-
 
 /**
  * Cache Exception
