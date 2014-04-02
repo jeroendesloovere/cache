@@ -1,7 +1,17 @@
 <?php
+/**
+ * Cache test
+ *
+ * This Cache PHP class allows you to cache pages and data for a certain time.
+ * Is a stand-alone class to create speed-win on the server snamee.
+ *
+ * @author Jeroen Desloovere <jeroen@siesqo.be>
+ */
 
-// require
-require_once '../src/JeroenDesloovere/Cache/Cache.php';
+// autoload files using Composer autoload
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use JeroenDesloovere\Cache;
 
 // define dummy data
 $data = array(
