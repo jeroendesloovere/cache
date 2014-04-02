@@ -8,10 +8,9 @@
  * @author Jeroen Desloovere <jeroen@siesqo.be>
  */
 
-// autoload files using Composer autoload
-require_once '../src/JeroenDesloovere/Cache/Cache.php';
+require_once __DIR__ . '/../src/JeroenDesloovere/Cache/Cache.php';
 
-use JeroenDesloovere\Cache;
+use JeroenDesloovere\Cache\Cache;
 
 // define dummy data
 $data = array(

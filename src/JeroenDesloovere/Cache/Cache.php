@@ -447,10 +447,3 @@ class Cache
         touch($filePath, time() + $lifetime);
     }
 }
-
-/**
- * Cache Exception
- *
- * @author Jeroen Desloovere <jeroen@siesqo.be>
- */
-class CacheException extends Exception {}
