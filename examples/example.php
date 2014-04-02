@@ -5,10 +5,10 @@
  * This Cache PHP class allows you to cache pages and data for a certain time.
  * Is a stand-alone class to create speed-win on the server snamee.
  *
- * @author Jeroen Desloovere <jeroen@siesqo.be>
+ * @author Jeroen Desloovere <info@jeroendesloovere.be>
  */
 
-require_once __DIR__ . '/../src/JeroenDesloovere/Cache/Cache.php';
+require_once __DIR__ . '/../src/Cache.php';
 
 use JeroenDesloovere\Cache\Cache;
 
