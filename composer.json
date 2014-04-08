@@ -1,9 +1,9 @@
 {
-    "name": "deslooverej/cache",
+    "name": "jeroendesloovere/cache",
     "type": "library",
     "description": "This Cache PHP class allows you to cache pages and data for a certain time. Is a stand-alone class to create speed-win on the server.",
     "keywords": ["cache", "php"],
-    "homepage": "https://github.com/deslooverej/cache",
+    "homepage": "https://github.com/jeroendesloovere/cache",
     "license": "MIT",
     "authors": [
         {
