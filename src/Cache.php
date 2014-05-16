@@ -90,7 +90,7 @@ class Cache
      *
      * @param string $filePath
      */
-    private static function delete($filePath)
+    protected static function delete($filePath)
     {
         // delete file if exists
         if (file_exists($filePath)) @unlink($filePath);
@@ -157,7 +157,7 @@ class Cache
      * @param  string $name
      * @return string
      */
-    private static function getCachePathToFile($type, $folder, $name)
+    protected static function getCachePathToFile($type, $folder, $name)
     {
         // define id for filename
         $name = (is_array($name)) ? implode('_', $name) : $name;
@@ -213,7 +213,7 @@ class Cache
      * @param  string $name
      * @return mixed
      */
-    private static function read($type, $folder, $name)
+    protected static function read($type, $folder, $name)
     {
         // define cache file path
         $cacheFilePath = self::getCachePathToFile($type, $folder, $name);
@@ -417,7 +417,7 @@ class Cache
      * @param mixed           $content
      * @param mixed[optional] $lifetime
      */
-    private static function write($type, $folder, $name, $content, $lifetime = false)
+    protected static function write($type, $folder, $name, $content, $lifetime = false)
     {
         // directory not exists
         if (!is_dir(self::getCachePath() . $folder . '/')) {
