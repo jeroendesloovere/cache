@@ -5,7 +5,7 @@ namespace JeroenDesloovere\Cache;
 /**
  * Cache
  *
- * @author Jeroen Desloovere <jeroen@siesqo.be>
+ * @author Jeroen Desloovere <info@jeroendesloovere.be>
  */
 class Cache
 {
