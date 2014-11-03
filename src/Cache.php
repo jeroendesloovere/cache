@@ -141,7 +141,7 @@ class Cache
     public static function getCachePath()
     {
         // cache path not defined
-        if (self::$cache['path'] == null) {
+        if (!isset(self::$cache['path'])) {
             // redefine cache path to default path
             self::setCachePath($_SERVER['DOCUMENT_ROOT'] . '/cache/');
         }
