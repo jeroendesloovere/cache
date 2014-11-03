@@ -1,7 +1,7 @@
 # Cache PHP class
 
 This Cache PHP class allows you to cache pages and data for a certain time.
-Is a stand-alone class to create speed-win on the server snamee.
+Is a stand-alone class to create speed-win on the server.
 
 ## Functions
 
