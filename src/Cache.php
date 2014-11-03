@@ -223,7 +223,7 @@ class Cache
             // get content from existing cache
             $content = file_get_contents($cacheFilePath);
 
-            // uncompress if necessairy
+            // uncompress if necessary
             if (self::CACHE_COMPRESSION && function_exists('gzuncompress')) $content = gzuncompress($content);
 
             // return content
@@ -431,7 +431,7 @@ class Cache
         // define file stream
         $fh = fopen($filePath,'w');
 
-        // compress content when necessairy
+        // compress content when necessary
         if (self::CACHE_COMPRESSION && function_exists('gzcompress')) $content = gzcompress($content, self::CACHE_COMPRESSION_LEVEL);
 
         // write data to file
