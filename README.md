@@ -5,6 +5,10 @@ Is a stand-alone class to create speed-win on the server.
 
 ## Installation
 
+### Using Composer
+
+When using [Composer](https://getcomposer.org) you can always load in the latest version.
+
 ```json
 {
     "require": {
@@ -12,6 +16,7 @@ Is a stand-alone class to create speed-win on the server.
     }
 }
 ```
+> Check [in Packagist](https://packagist.org/packages/jeroendesloovere/cache).
 
 ## Functions
 
